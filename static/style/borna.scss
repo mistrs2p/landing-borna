@@ -1,0 +1,19 @@
+.borna {
+  max-width: 500px!important;
+  min-width: 340px!important;
+
+  font-family: YekanBakh, sans-serif;
+  direction: rtl!important;
+  font-size: 16px;
+  font-weight: 400;
+
+  & > div {
+    height: 630px;
+  }
+  .section {
+    height: 550px;
+    & > div {
+      height: 550px;
+    }
+  }
+}
