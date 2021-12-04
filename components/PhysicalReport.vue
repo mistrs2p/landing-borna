@@ -26,12 +26,12 @@
         </div>
         <div class="goal-detail timetogoal d-flex flex-column justify-content-center">
           <h4>مدت زمان رسیدن به هدف</h4>
-          <p>12 ماه</p>
+          <p>{{ Math.ceil(setGoalTime() / 30) }} ماه</p>
         </div>
       </div>
     </div>
-    <p class="detail">
-      وزن تو 100 کیلوگرم (30 کیلوگرم از وزنت چربیه)
+    <p v-if="fat.hasFat" class="detail">
+      وزن تو {{ weight }} کیلوگرم ({{ calculatedWeight }} کیلوگرم از وزنت چربیه)
     </p>
     <div class="physic-submit d-flex justify-content-around">
       <button class="btn stay">
@@ -64,7 +64,11 @@ export default {
       coefficient: null,
       normalWeight: null,
       calculatedWeight: null,
-      calculatedWeightDetail: null
+      calculatedWeightDetail: null,
+      fat: {
+        text: 'چربیه',
+        hasFat: false
+      }
     }
   },
   computed: {
@@ -88,9 +92,11 @@ export default {
     if (this.weight > this.normalWeight) {
       this.calculatedWeight = this.weight - this.normalWeight
       this.calculatedWeightDetail = 'اضافه وزن'
+      this.fat.hasFat = true
     } else {
       this.calculatedWeight = this.normalWeight - this.weight
       this.calculatedWeightDetail = 'کمبود وزن'
+      this.fat.hasFat = false
     }
 
     if (bmi < 19) {
@@ -183,6 +189,39 @@ export default {
         }
       }
       return this.coefficient
+    },
+    setGoalTime () {
+      const weightDifference = Math.abs(this.weight - this.normalWeight)
+      let time1 = null
+      let time2 = null
+      let time3 = null
+      // Calculate time1
+      if (this.weight > 100) {
+        time1 = (this.weight - 100) / 4
+      } else if (this.weight < 100 && this.normalWeight > 100) {
+        time1 = weightDifference / 4
+      }
+      // Calculate time2
+      if (this.weight > 100 && this.normalWeight <= 70) {
+        time2 = (100 - 70) / 3.5
+      } else if (this.weight > 100 && this.normalWeight > 70) {
+        time2 = (this.normalWeight - 70) / 3.5
+      } else if (this.weight <= 100 && this.weight > 70 && this.normalWeight > 70) {
+        time2 = (weightDifference / 3.5)
+      } else if (this.weight <= 100 && this.weight > 70 && this.normalWeight <= 70) {
+        time2 = (this.weight - 70) / 3.5
+      }
+      // Calculate time3
+      if (this.normalWeight > 70) {
+        time3 = 0
+      } else if (this.weight <= 70) {
+        time3 = weightDifference / 3
+      } else if (this.weight > 70) {
+        time3 = (70 - this.normalWeight) / 3
+      }
+
+      const goalTime = Math.floor((time1 + time2 + time3) * 30)
+      return goalTime
     }
   }
 }
